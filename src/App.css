@@ -1,0 +1,16 @@
+:root {
+  color-scheme: dark;
+}
+
+/* Force dark mode for form elements */
+input, select, textarea, button {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+/* This forces the default browser controls to use dark mode */
+@media (prefers-color-scheme: dark) {
+  input, select, textarea, button {
+    color-scheme: dark;
+  }
+}
