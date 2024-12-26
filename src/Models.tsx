@@ -9,9 +9,15 @@ type CourseAPIResponse = {
     total_courses: number;
 };
 
+type LinkInfoAPIResponse = {
+    title: string,
+    url: string
+}
+
 type CourseDetailsAPIResponse = {
     metadata: Course,
-    resources: ResourceInfoAPIResponse[]
+    resources: ResourceInfoAPIResponse[],
+    links: LinkInfoAPIResponse[]
 };
 
 type InsertCourseAPIRequest = {
