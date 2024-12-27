@@ -1,5 +1,5 @@
 import { ResourceInfoAPIResponse } from "./Models";
-import { Card, CardContent, Typography, Box, Chip, IconButton, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, SwipeableDrawer, Grow, ListItemIcon, Button } from "@mui/material";
+import { Card, CardContent, Typography, Box, Chip, IconButton, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, SwipeableDrawer, Grow, ListItemIcon, Button, CircularProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -24,7 +24,8 @@ function fileIcon(fileName: string) {
     return <FileIcon />;
 }
 
-async function downloadAllFilesAsZip(files: FileResourceInfo[], resource: ResourceInfoAPIResponse) {
+async function downloadAllFilesAsZip(files: FileResourceInfo[], resource: ResourceInfoAPIResponse, setIsLoading: (isLoading: boolean) => void) {
+    setIsLoading(true);
     const zip = new JSZip();
     let folder = zip.folder(resource.resource_info.title + ' - ' + resource.resource_info.semester + ' ' + resource.resource_info.academic_year)!;
     for (const file of files) {
@@ -40,6 +41,7 @@ async function downloadAllFilesAsZip(files: FileResourceInfo[], resource: Resour
         link.download = `${resource.resource_info.title}.zip`;
         link.click();
     });
+    setIsLoading(false);
 }
 
 const downloadFile = async (url: string, fileName: string) => {
@@ -96,6 +98,7 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
 
 export default function ResourceCard({ resource, onSheetStateChange }: ResourceCardProps) {
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [isZipLoading, setIsZipLoading] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -164,7 +167,7 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                     startIcon={<DownloadIcon />}
                     onClick={(e) => {
                         e.stopPropagation();
-                        downloadAllFilesAsZip(resource.files, resource);
+                        downloadAllFilesAsZip(resource.files, resource, setIsZipLoading);
                     }}
                     sx={{
                         mt: 2,
@@ -175,8 +178,9 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                             backgroundColor: 'rgba(255, 255, 255, 0.25)',
                         }
                     }}
+                    disabled={isZipLoading}
                 >
-                    Download All as ZIP
+                    {isZipLoading ? <CircularProgress size={20} sx={{ color: 'rgba(255, 255, 255, 0.9)' }} /> : 'Download All as ZIP'}
                 </Button>
                 
             </DialogContent>
