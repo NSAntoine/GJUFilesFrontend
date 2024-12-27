@@ -52,16 +52,23 @@ async function downloadAllFilesAsZip(files: FileResourceInfo[], resource: Resour
 
 const downloadFile = async (url: string, fileName: string) => {
     try {
-        const response = await fetch(url); 
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
+        // Create a temporary anchor element
         const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = fileName;
+        
+        // Add download attribute and filename
+        link.setAttribute('download', fileName);
+        link.setAttribute('target', '_blank');
+        
+        // For mobile browsers, add a timestamp to bypass cache
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            const timestamp = new Date().getTime();
+            url = `${url}${url.includes('?') ? '&' : '?'}_t=${timestamp}`;
+        }
+        
+        link.href = url;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
         console.error('Download failed:', error);
     }
