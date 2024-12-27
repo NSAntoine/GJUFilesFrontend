@@ -460,8 +460,8 @@ function resourceTypeSubtitle(resourceType: number) {
                     disabled={isLoading}
                   >
                     <MenuItem value="" disabled>Select semester...</MenuItem>
-                    <MenuItem value="Fall">Fall</MenuItem>
-                    <MenuItem value="Spring">Spring</MenuItem>
+                    <MenuItem value="First">First</MenuItem>
+                    <MenuItem value="Second">Second</MenuItem>
                     <MenuItem value="Summer">Summer</MenuItem>
                   </Select>
                   <FormHelperText error={!!form.formState.errors.semester}>
