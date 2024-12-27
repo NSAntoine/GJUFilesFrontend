@@ -4,7 +4,7 @@ import './App.css'
 
 import CourseCard from './CourseCard';
 import { Course, CourseAPIResponse, facultyCompleteNameMap, getFacultyShortName } from './Models';
-import { Pagination, Fade, Select, MenuItem, FormControl, InputLabel, Divider } from '@mui/material';
+import { Pagination, Fade, Select, MenuItem, FormControl, InputLabel, Divider, Typography } from '@mui/material';
 import SearchAppBar from './SearchAppBar';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -78,7 +78,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentFaculty, setCurrentFaculty] = useState(-1);
-
+  const [error, setError] = useState<string | null>(null);
   const handleFacultyClick = (facultyId: number) => {
     setCurrentPage(1);
     setCurrentFaculty(facultyId);
@@ -166,7 +166,7 @@ function App() {
     </Box>
   );
 
-  const fetchCourses = async (page: number, search: string, faculty?: number) => {
+  const fetchCourses = async (page: number, search: string, faculty?: number, setError?: (error: string) => void) => {
     setIsLoading(true);
     try {
       const activeFaculty = faculty !== undefined ? faculty : currentFaculty;
@@ -175,13 +175,16 @@ function App() {
       setCourseResponse(data);
     } catch (error) {
       console.error('Error fetching courses:', error);
+      if (setError) {
+        setError('Error fetching courses: ' + error + ' (API URL: ' + makeAPIURL(page, search, currentFaculty) + ')');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-      fetchCourses(currentPage, searchQuery);
+      fetchCourses(currentPage, searchQuery, currentFaculty, setError);
   }, [searchQuery, currentPage]);
 
   return (
@@ -235,6 +238,20 @@ function App() {
             </div>
           </Fade>
         ))}
+
+        {error && 
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              textAlign: 'center',
+              fontWeight: 'bold',
+              gridColumn: '1 / -1',
+            }}
+          > 
+            {error}
+          </Typography>
+        }
       </Box>
 
       <div style={{ 
