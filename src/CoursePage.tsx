@@ -139,8 +139,8 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
           marginTop: '20px',
           width: '100%'
         }}>
-          {tabView(0, "📝", "Notes (0)")}
-          {tabView(1, "📚", "Exams (0)")}
+          {tabView(0, "📝", "Notes")}
+          {tabView(1, "📚", "Exams")}
         </div>
 
         <div style={{ marginTop: '20px', width: '100%' }}>
