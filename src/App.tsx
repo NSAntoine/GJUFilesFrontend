@@ -202,7 +202,7 @@ function App() {
             <SearchIcon />
           </SearchIconWrapper>
           <StyledInputBase
-            placeholder="Search courses..."
+            placeholder="Search by Course Name / ID..."
             inputProps={{ 'aria-label': 'search courses' }}
             value={searchQuery}
             onChange={(e) => {
