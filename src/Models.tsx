@@ -17,7 +17,9 @@ type LinkInfoAPIResponse = {
 type CourseDetailsAPIResponse = {
     metadata: Course,
     resources: ResourceInfoAPIResponse[],
-    links: LinkInfoAPIResponse[]
+    links: LinkInfoAPIResponse[],
+    no_notes: number,
+    no_exams: number
 };
 
 type InsertCourseAPIRequest = {
