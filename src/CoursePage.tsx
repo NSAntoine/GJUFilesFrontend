@@ -170,9 +170,41 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
             right: 0,
             boxSizing: 'border-box'
           }}>
-            {courseDetails.resources.map((resource) => (
-              <ResourceCard key={resource.resource_info.resource_id} resource={resource} />
-            ))}
+            {courseDetails.resources.length > 0 ? (
+              courseDetails.resources.map((resource) => (
+                <ResourceCard key={resource.resource_info.resource_id} resource={resource} />
+              ))
+            ) : (
+              <Box sx={{ 
+                gridColumn: '1 / -1',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '200px',
+              }}>
+                <Typography 
+                  variant="h4" 
+                  sx={{ 
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  No {selectedTab === 0 ? 'Notes' : 'Exams'} Available
+                </Typography>
+                <Typography 
+                  variant="subtitle1" 
+                  sx={{ 
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    textAlign: 'center',
+                    mt: 0.60
+                  }}
+                >
+                  You can upload one by clicking the <span style={{ color: '#9370DB' }}>Upload</span> button
+                </Typography>
+              </Box>
+            )}
           </Box>
         </Fade>
       </>

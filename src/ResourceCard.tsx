@@ -10,6 +10,7 @@ import FileIcon from '@mui/icons-material/FilePresent';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { FileResourceInfo } from "./Models";
 import JSZip from 'jszip';
+import { ImageIcon } from "lucide-react";
 
 interface ResourceCardProps {
     resource: ResourceInfoAPIResponse;
@@ -21,6 +22,11 @@ function fileIcon(fileName: string) {
     if (extension === 'pdf') {
         return <PdfIcon />;
     }
+
+    if (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif' || extension === 'webp') {
+        return <ImageIcon />;
+    }
+
     return <FileIcon />;
 }
 
@@ -109,13 +115,44 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
 
     const sheetContent = (
         <>
-            <DialogTitle sx={{ color: '#ffffff' }}>
-                {resource.resource_info.title}
+            <DialogTitle sx={{ 
+                color: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1
+            }}>
+                <Typography 
+                    variant="h6" 
+                    component="div"
+                    sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 600,
+                        lineHeight: 1.3
+                    }}
+                >
+                    {resource.resource_info.title}
+                </Typography>
+                <Chip
+                    label={`${resource.resource_info.semester} ${resource.resource_info.academic_year}`}
+                    sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontWeight: 500,
+                        fontSize: '0.85rem',
+                        height: '28px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em',
+                        alignSelf: 'flex-start',
+                        '& .MuiChip-label': {
+                            padding: '0 12px'
+                        }
+                    }}
+                />
             </DialogTitle>
             <DialogContent>
                 <List sx={{ px: 1 }}>
                     {resource.files.map((file, index) => (
-                        <StyledListItem key={index}>
+                        <StyledListItem onClick={() => downloadFile(file.file_url, file.file_name)} key={index}>
                             <ListItemIcon sx={{
                                 minWidth: '40px',
                                 '& svg': {
@@ -259,7 +296,7 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                     disableSwipeToOpen
                     PaperProps={{
                         sx: {
-                            background: 'rgba(25, 25, 25, 0.95)',
+                            background: 'linear-gradient(to bottom, #1a1b26 0%, #1f2937 100%)',
                             backdropFilter: 'blur(10px)',
                             borderRadius: '16px 16px 0 0',
                             maxHeight: '90vh',
@@ -295,7 +332,7 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                     }}
                     PaperProps={{
                         sx: {
-                            background: 'rgba(25, 25, 25, 0.95)',
+                            background: 'linear-gradient(to bottom, #1a1b26 0%, #1f2937 100%)',
                             backdropFilter: 'blur(10px)',
                             borderRadius: '16px',
                             transform: 'none',
