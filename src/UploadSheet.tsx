@@ -79,6 +79,7 @@ function resourceTypeSubtitle(resourceType: number) {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [selectedResourceType, setSelectedResourceType] = useState<number>(-1);
+    const [isLoading, setIsLoading] = useState(false);
   
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -119,6 +120,7 @@ function resourceTypeSubtitle(resourceType: number) {
     }, [selectedTab]);
   
     async function onSubmit(values: z.infer<typeof formSchema>) {
+      setIsLoading(true);
       try {
         if (values.resourceType === 2) {
           if (!values.linkURL) {
@@ -180,6 +182,8 @@ function resourceTypeSubtitle(resourceType: number) {
       } catch (error) {
         console.error('Error during submission:', error);
         alert(`An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      } finally {
+        setIsLoading(false);
       }
     }
   
@@ -200,6 +204,7 @@ function resourceTypeSubtitle(resourceType: number) {
         <Button 
           variant="contained" 
           onClick={handleUploadClick}
+          disabled={isLoading}
           sx={{ 
             width: isMobile ? '100%' : 'auto',
             marginLeft: 'auto',
@@ -216,7 +221,7 @@ function resourceTypeSubtitle(resourceType: number) {
             fontSize: '1.1rem'
           }}
         >
-          📤 Upload
+          {isLoading ? <CircularProgress size={24} color="inherit" /> : '📤 Upload'}
         </Button>
   
         <Menu
@@ -341,7 +346,7 @@ function resourceTypeSubtitle(resourceType: number) {
                 <TextField
                   placeholder="Enter title..."
                   {...form.register("title")}
-                  disabled={form.watch("resourceType") === -1}
+                  disabled={form.watch("resourceType") === -1 || isLoading}
                   error={!!form.formState.errors.title}
                   helperText={form.formState.errors.title?.message ? 
                     form.formState.errors.title?.message + " " + 
@@ -386,6 +391,7 @@ function resourceTypeSubtitle(resourceType: number) {
                   <TextField
                     placeholder="Enter link URL..."
                     {...form.register("linkURL")}
+                    disabled={isLoading}
                     sx={{
                       color: 'white',
                       backgroundColor: 'rgba(255, 255, 255, 0.05)',
@@ -451,6 +457,7 @@ function resourceTypeSubtitle(resourceType: number) {
                         color: 'white',
                       },
                     }}
+                    disabled={isLoading}
                   >
                     <MenuItem value="" disabled>Select semester...</MenuItem>
                     <MenuItem value="Fall">Fall</MenuItem>
@@ -488,6 +495,7 @@ function resourceTypeSubtitle(resourceType: number) {
                         color: props => !!form.formState.errors.year ? '#f44336' : 'white',
                       },
                     }}
+                    disabled={isLoading}
                   />
                 </FormControl>
               </div>
@@ -515,6 +523,7 @@ function resourceTypeSubtitle(resourceType: number) {
                           multiple
                           className="hidden"
                           onChange={handleFileChange}
+                          disabled={isLoading}
                         />
                       </label>
                     </div>
@@ -541,6 +550,7 @@ function resourceTypeSubtitle(resourceType: number) {
                             <IconButton
                               onClick={() => removeFile(index)}
                               size="small"
+                              disabled={isLoading}
                               sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                             >
                               <CloseIcon fontSize="small" />
@@ -576,6 +586,7 @@ function resourceTypeSubtitle(resourceType: number) {
                       },
                     },
                   }}
+                  disabled={isLoading}
                 />
                 </FormControl>
               )}
@@ -584,6 +595,7 @@ function resourceTypeSubtitle(resourceType: number) {
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={isLoading}
                 onClick={() => console.log("🔘 Upload button clicked")}
                 sx={{
                   marginTop: '24px',
@@ -598,7 +610,11 @@ function resourceTypeSubtitle(resourceType: number) {
                   borderRadius: '16px',
                 }}
               >
-                Upload
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  'Upload'
+                )}
               </Button>
             </form>
           </DialogContent>

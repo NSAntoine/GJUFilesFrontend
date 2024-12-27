@@ -1,5 +1,5 @@
 import { ResourceInfoAPIResponse } from "./Models";
-import { Card, CardContent, Typography, Box, Chip, IconButton, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, SwipeableDrawer, Grow, ListItemIcon } from "@mui/material";
+import { Card, CardContent, Typography, Box, Chip, IconButton, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemText, SwipeableDrawer, Grow, ListItemIcon, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -7,6 +7,9 @@ import { useTheme } from '@mui/material/styles';
 import DownloadIcon from '@mui/icons-material/Download';
 import PdfIcon from '@mui/icons-material/PictureAsPdf';
 import FileIcon from '@mui/icons-material/FilePresent';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { FileResourceInfo } from "./Models";
+import JSZip from 'jszip';
 
 interface ResourceCardProps {
     resource: ResourceInfoAPIResponse;
@@ -20,6 +23,41 @@ function fileIcon(fileName: string) {
     }
     return <FileIcon />;
 }
+
+async function downloadAllFilesAsZip(files: FileResourceInfo[], resource: ResourceInfoAPIResponse) {
+    const zip = new JSZip();
+    let folder = zip.folder(resource.resource_info.title + ' - ' + resource.resource_info.semester + ' ' + resource.resource_info.academic_year)!;
+    for (const file of files) {
+        let data = await fetch(file.file_url);
+        folder.file(file.file_name, data.blob());
+    }
+
+    console.log(folder);
+
+    zip.generateAsync({ type: 'blob' }).then(content => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(content);
+        link.download = `${resource.resource_info.title}.zip`;
+        link.click();
+    });
+}
+
+const downloadFile = async (url: string, fileName: string) => {
+    try {
+        const response = await fetch(url); 
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+        console.error('Download failed:', error);
+    }
+};
 
 const StyledCard = styled(Card)(({ theme }) => ({
     position: 'relative',
@@ -46,6 +84,7 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
     border: '1px solid rgba(255, 255, 255, 0.1)',
     backdropFilter: 'blur(5px)',
     transition: 'all 0.2s ease-in-out',
+    padding: '4px 16px',
 
     '&:hover': {
         background: 'rgba(255, 255, 255, 0.15)',
@@ -74,25 +113,72 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                 <List sx={{ px: 1 }}>
                     {resource.files.map((file, index) => (
                         <StyledListItem key={index}>
-                            <ListItemIcon sx={{}} color="white">
+                            <ListItemIcon sx={{
+                                minWidth: '40px',
+                                '& svg': {
+                                    backgroundColor: 'rgba(25, 25, 25, 0.95)',
+                                    color: 'rgba(255, 255, 255, 0.9)',
+                                    padding: '4px',
+                                    borderRadius: '4px',
+                                    fontSize: '1.9rem'
+                                }
+                            }}>
                                 {fileIcon(file.file_name)}
                             </ListItemIcon>
                             <ListItemText 
                                 primary={file.file_name}
                                 sx={{ 
-                                    py: 1,
+                                    py: 0.5,
+                                    mr: 2,
                                     '& .MuiListItemText-primary': { 
                                         color: 'rgba(255, 255, 255, 0.9)',
-                                        fontWeight: 500
+                                        fontWeight: 500,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
                                     } 
                                 }}
                             />
-                            <IconButton href={file.file_url} target="_blank">
+                            <IconButton 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(file.file_url, '_blank');
+                                }}
+                                sx={{ mr: 1 }}
+                            >
+                                <OpenInNewIcon sx={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+                            </IconButton>
+                            <IconButton onClick={(e) => {
+                                e.stopPropagation();
+                                downloadFile(file.file_url, file.file_name);
+                            }}>
                                 <DownloadIcon sx={{ color: 'rgba(255, 255, 255, 0.9)' }} /> 
                             </IconButton>
                         </StyledListItem>
                     ))}
                 </List>
+
+                <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<DownloadIcon />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        downloadAllFilesAsZip(resource.files, resource);
+                    }}
+                    sx={{
+                        mt: 2,
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(5px)',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                        }
+                    }}
+                >
+                    Download All as ZIP
+                </Button>
+                
             </DialogContent>
         </>
     );
