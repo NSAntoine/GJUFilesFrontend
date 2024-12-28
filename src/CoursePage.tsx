@@ -219,7 +219,6 @@ export default function CoursePage() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [displayedTab, setDisplayedTab] = useState(0);
   
-  // Add cache state for both tabs
   const [cachedDetails, setCachedDetails] = useState<{
     [key: number]: CourseDetailsAPIResponse | null
   }>({
@@ -250,27 +249,6 @@ export default function CoursePage() {
         setLoading(false);
       });
   }, [selectedTab, courseId]);
-
-  useEffect(() => {
-    if (cachedDetails[displayedTab]) {
-      const details = cachedDetails[displayedTab]!;
-      document.title = details.metadata.course_name;
-      
-      updateMetaTag('og:title', details.metadata.course_name);
-      updateMetaTag('og:type', 'website');
-      updateMetaTag('og:description', `${details.metadata.course_id} - ${getFacultyShortName(details.metadata.course_faculty)}`);
-    }
-  }, [cachedDetails, displayedTab]);
-  
-  const updateMetaTag = (property: string, content: string) => {
-    let meta = document.querySelector(`meta[property="${property}"]`);
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute('property', property);
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute('content', content);
-  };
 
   return (
     <>
