@@ -22,20 +22,6 @@ export function errorPage(error: string) {
 }
 
 function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab: number, setSelectedTab: (tab: number) => void) {
-  useEffect(() => {
-    document.title = courseDetails.metadata.course_name;
-    
-    updateMetaTag('og:title', courseDetails.metadata.course_name);
-    updateMetaTag('og:description', `${courseDetails.metadata.course_id} - ${getFacultyShortName(courseDetails.metadata.course_faculty)}`);
-    updateMetaTag('og:type', 'website');
-
-    return () => {
-      document.title = 'GJU Courses';
-      updateMetaTag('og:title', 'GJU Courses');
-      updateMetaTag('og:description', 'Find and review GJU courses');
-    };
-  }, [courseDetails]);
-
   function tabView(tab: number, emoji: string, text: string) {
     return <div 
       style={{
@@ -76,6 +62,7 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
 
     return (
       <>
+        <title>{courseDetails.metadata.course_name}</title>
         <div style={{
           background: 'rgba(255, 255, 255, 0.05)',
           borderRadius: '16px',
@@ -225,16 +212,6 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
     )
   }
 
-function updateMetaTag(property: string, content: string) {
-  let meta = document.querySelector(`meta[property="${property}"]`);
-  if (!meta) {
-    meta = document.createElement('meta');
-    meta.setAttribute('property', property);
-    document.head.appendChild(meta);
-  }
-  meta.setAttribute('content', content);
-}
-
 export default function CoursePage() {
   const { courseId } = useParams()
   const [loading, setLoading] = useState(true);
@@ -273,6 +250,27 @@ export default function CoursePage() {
         setLoading(false);
       });
   }, [selectedTab, courseId]);
+
+  useEffect(() => {
+    if (cachedDetails[displayedTab]) {
+      const details = cachedDetails[displayedTab]!;
+      document.title = details.metadata.course_name;
+      
+      updateMetaTag('og:title', details.metadata.course_name);
+      updateMetaTag('og:type', 'website');
+      updateMetaTag('og:description', `${details.metadata.course_id} - ${getFacultyShortName(details.metadata.course_faculty)}`);
+    }
+  }, [cachedDetails, displayedTab]);
+  
+  const updateMetaTag = (property: string, content: string) => {
+    let meta = document.querySelector(`meta[property="${property}"]`);
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('property', property);
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', content);
+  };
 
   return (
     <>
