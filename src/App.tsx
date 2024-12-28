@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { API_COURSES_URL } from './APIDefines';
 import './App.css'
+import debounce from 'lodash/debounce';
 
 import CourseCard from './CourseCard';
 import { Course, CourseAPIResponse, facultyCompleteNameMap, getFacultyShortName } from './Models';
@@ -79,10 +80,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentFaculty, setCurrentFaculty] = useState(-1);
   const [error, setError] = useState<string | null>(null);
+
   const handleFacultyClick = (facultyId: number) => {
     setCurrentPage(1);
     setCurrentFaculty(facultyId);
-    fetchCourses(1, searchQuery, facultyId);
+    fetchCourses(1, searchQuery, facultyId, setError);
   };
 
   const facultyFilters = (
@@ -167,6 +169,7 @@ function App() {
   );
 
   const fetchCourses = async (page: number, search: string, faculty?: number, setError?: (error: string) => void) => {
+    console.log('Fetching courses with page:', page, 'search:', search, 'faculty:', faculty);
     setIsLoading(true);
     try {
       const activeFaculty = faculty !== undefined ? faculty : currentFaculty;
@@ -183,9 +186,28 @@ function App() {
     }
   };
 
+  const debouncedFetch = useCallback(
+    debounce((search: string) => {
+      setCurrentPage(1);
+      fetchCourses(1, search, currentFaculty, setError);
+    }, 230),
+    [currentFaculty]
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    debouncedFetch(e.target.value);
+  };
+
   useEffect(() => {
+    if (currentPage > 1) {
       fetchCourses(currentPage, searchQuery, currentFaculty, setError);
-  }, [searchQuery, currentPage]);
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchCourses(1, '', currentFaculty, setError);
+  }, []);
 
   return (
     <>
@@ -208,10 +230,7 @@ function App() {
             placeholder="Search by Course Name / ID..."
             inputProps={{ 'aria-label': 'search courses' }}
             value={searchQuery}
-            onChange={(e) => {
-              setCurrentPage(1)
-              setSearchQuery(e.target.value)
-            }}
+            onChange={handleSearchChange}
           />
         </Search>
       </div>
