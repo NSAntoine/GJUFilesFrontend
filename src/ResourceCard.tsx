@@ -74,7 +74,7 @@ const downloadFile = async (url: string, fileName: string) => {
 
 const StyledCard = styled(Card)(({ theme }) => ({
     position: 'relative',
-    background: 'rgba(255, 255, 255, 0.15)',
+    background: 'rgba(255, 255, 255, 0.08)',
     border: '1px solid rgba(255, 255, 255, 0.3)',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -85,8 +85,8 @@ const StyledCard = styled(Card)(({ theme }) => ({
     '&:hover': {
         transform: 'translateY(-4px)',
         boxShadow: '0 12px 48px rgba(0, 0, 0, 0.2)',
-        background: 'rgba(255, 255, 255, 0.25)',
-        border: '1px solid rgba(255, 255, 255, 0.4)',
+        background: 'rgba(255, 255, 255, 0.15)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
     }
 }));
 

@@ -393,8 +393,34 @@ function resourceTypeSubtitle(resourceType: number) {
                     {...form.register("linkURL")}
                     disabled={isLoading}
                     sx={{
-                      color: 'white',
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      '& .MuiOutlinedInput-root': {
+                        color: 'white',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        '&.Mui-disabled': {
+                          color: 'white',
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                        },
+                        '& fieldset': {
+                          borderColor: 'rgba(255, 255, 255, 0.1)',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                        },
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: 'white',
+                      },
+                      '& .MuiFormHelperText-root': {
+                        color: !!form.formState.errors.linkURL ? '#f44336' : 'white',
+                        fontSize: '17px',
+                        marginTop: '4px',
+                        marginBottom: 0,
+                        marginLeft: '2px',
+                        fontStyle: 'italic'
+                      },
                     }}
                   />
                 </FormControl>
