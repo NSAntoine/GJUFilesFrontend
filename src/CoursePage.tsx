@@ -62,6 +62,7 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
 
     return (
       <>
+        <title>{courseDetails.metadata.course_name}</title>
         <div style={{
           background: 'rgba(255, 255, 255, 0.05)',
           borderRadius: '16px',

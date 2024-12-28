@@ -111,6 +111,7 @@ function Credits() {
 export default function AboutPage() {
     return ( 
         <>
+        <title>About GJUFiles</title>
         <SearchAppBar/>
 
         <div style={{paddingTop: '140px', paddingLeft: '30px', paddingRight: '30px'}}>
