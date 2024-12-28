@@ -271,7 +271,7 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                                 }}
                             />
                             <Chip
-                                label={`${resource.files.length} files`}
+                                label={`${resource.files.length == 1 ? '1 file' : `${resource.files.length} files`}`}
                                 sx={{
                                     backgroundColor: 'rgba(255, 255, 255, 0.15)',
                                     color: 'rgba(255, 255, 255, 0.9)',
