@@ -153,11 +153,18 @@ export default function ResourceCard({ resource, onSheetStateChange }: ResourceC
                         }
                     }}
                 />
+
+                <Typography variant="subtitle1" sx={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '1rem', lineHeight: 1.5 }}>
+                    {resource.resource_info.subtitle}
+                </Typography>
             </DialogTitle>
             <DialogContent>
                 <List sx={{ px: 1 }}>
                     {resource.files.map((file, index) => (
-                        <StyledListItem onClick={() => downloadFile(file.file_url, file.file_name)} key={index}>
+                        <StyledListItem onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(file.file_url, '_blank');
+                        }} key={index}>
                             <ListItemIcon sx={{
                                 minWidth: '40px',
                                 '& svg': {
