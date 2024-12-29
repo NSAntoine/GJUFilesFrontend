@@ -13,6 +13,8 @@ import { InsertCourseAPIRequest } from './Models'
 import ResourceCard from './ResourceCard'
 import { LinkIcon } from 'lucide-react'
 import { UploadButton } from './UploadSheet'
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 export function errorPage(error: string) {
   if (error == "Load failed") {
@@ -21,7 +23,7 @@ export function errorPage(error: string) {
   return <div>Error: {error}</div>
 }
 
-function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab: number, setSelectedTab: (tab: number) => void) {
+function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab: number, setSelectedTab: (tab: number) => void, isFavorite: boolean, setIsFavorite: (isFavorite: boolean) => void) {
   function tabView(tab: number, emoji: string, text: string) {
     return <div 
       style={{
@@ -88,10 +90,46 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
             {courseDetails.metadata.course_name}
           </Typography>
           
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            {chipView(courseDetails.metadata.course_id)}
-            {chipView(getFacultyShortName(courseDetails.metadata.course_faculty))}
-          </div>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            gap: '12px',
+            flexWrap: 'wrap',
+            alignItems: 'center'
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: '12px', 
+              flexWrap: 'wrap'
+            }}>
+              {chipView(courseDetails.metadata.course_id)}
+              {chipView(getFacultyShortName(courseDetails.metadata.course_faculty))}
+            </Box>
+            <IconButton
+              onClick={() => {
+                var favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]');
+                if (isFavorite) {
+                  favCourses = favCourses.filter((id: string) => id !== courseDetails.metadata.course_id);
+                } else {
+                  favCourses.push(courseDetails.metadata.course_id);
+                }
+
+                localStorage.setItem('favCourses', JSON.stringify(favCourses));
+                setIsFavorite(!isFavorite);
+              }}
+              sx={{
+                marginLeft: 'auto',
+                color: isFavorite ? '#FFD700' : 'white', /* should I just use 'yellow' instead? */
+                padding: '8px',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+                transition: 'all 0.2s ease-in-out',
+              }}
+            >
+              {isFavorite ? <StarIcon /> : <StarBorderIcon />}
+            </IconButton>
+          </Box>
 
           <div style={{ 
             marginTop: '15px', 
@@ -219,6 +257,9 @@ export default function CoursePage() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [displayedTab, setDisplayedTab] = useState(0);
   
+  const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]');
+  const [isFavorite, setIsFavorite] = useState(favCourses.includes(courseId));
+  
   const [cachedDetails, setCachedDetails] = useState<{
     [key: number]: CourseDetailsAPIResponse | null
   }>({
@@ -257,7 +298,7 @@ export default function CoursePage() {
         {error ? (
           errorPage(error)
         ) : cachedDetails[displayedTab] ? (
-          CourseDetailsView(cachedDetails[displayedTab]!, selectedTab, setSelectedTab)
+          CourseDetailsView(cachedDetails[displayedTab]!, selectedTab, setSelectedTab, isFavorite, setIsFavorite)
         ) : (
           <CircularProgress size={50} style={{ margin: 'auto', display: 'block' }} />
         )}
