@@ -11,6 +11,7 @@ import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import Box from '@mui/material/Box';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -80,6 +81,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentFaculty, setCurrentFaculty] = useState(-1);
   const [error, setError] = useState<string | null>(null);
+
+  const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]') as Course[];
+  console.log(favCourses);
 
   const handleFacultyClick = (facultyId: number) => {
     setCurrentPage(1);
@@ -200,9 +204,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (currentPage > 1) {
-      fetchCourses(currentPage, searchQuery, currentFaculty, setError);
-    }
+    fetchCourses(currentPage, searchQuery, currentFaculty, setError);
   }, [currentPage]);
 
   useEffect(() => {
@@ -248,15 +250,58 @@ function App() {
           px: '30px' 
         }}
       >
-        {courseResponse && courseResponse.courses.map((course: Course) => (
-          <Fade in={!isLoading} timeout={200} key={course.course_id}>
-            <div>
-              <CourseCard 
+        {favCourses && searchQuery === '' && currentPage === 1 && (
+          <>
+            <Typography variant="h5" sx={{ color: 'white', textAlign: 'left', fontWeight: 'bold', gridColumn: '1 / -1' }}>
+              Favourite Courses
+            </Typography>
+            {favCourses.length > 0 ? favCourses.map((course: Course) => (
+              <Fade in={!isLoading} timeout={200} key={course.course_id}>
+                <div>
+                <CourseCard 
+                  course={course} 
+                  />
+                </div>
+              </Fade>
+            )) : (
+              <Box sx={{ 
+                gridColumn: '1 / -1',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.5)',
+                textAlign: 'center',
+                }}
+              >
+                You can favourite a course by clicking the <StarBorderIcon style={{ color: 'white' }} /> icon on the course page
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
+
+        {courseResponse && (
+          <>
+            <Typography variant="h5" sx={{ color: 'white', textAlign: 'left', fontWeight: 'bold', gridColumn: '1 / -1' }}>
+              All Courses
+            </Typography>
+            {courseResponse.courses.map((course: Course) => (
+              <Fade in={!isLoading} timeout={200} key={course.course_id}>
+                <div>
+                  <CourseCard 
                 course={course} 
               />
             </div>
-          </Fade>
-        ))}
+              </Fade>
+            ))}
+          </>
+        )}
 
         {error && 
           <Typography 

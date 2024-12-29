@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { API_COURSE_DETAILS_URL, API_INSERT_COURSE_LINK_URL, API_INSERT_COURSE_URL } from './APIDefines'
 import SearchAppBar from './SearchAppBar'
-import { CourseDetailsAPIResponse, InsertCourseLinkAPIRequest } from './Models'
+import { Course, CourseDetailsAPIResponse, InsertCourseLinkAPIRequest } from './Models'
 import { Typography, Chip, CircularProgress, Divider, Button, Dialog, DialogContent, DialogTitle, useMediaQuery, useTheme, IconButton, Select, MenuItem, TextField, FormControl, FormLabel, FormHelperText, Box, Fade, Menu } from '@mui/material'
 import { getFacultyShortName } from './Models'
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -107,11 +107,11 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
             </Box>
             <IconButton
               onClick={() => {
-                var favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]');
+                var favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]') as Course[];
                 if (isFavorite) {
-                  favCourses = favCourses.filter((id: string) => id !== courseDetails.metadata.course_id);
+                  favCourses = favCourses.filter((id: Course) => id.course_id !== courseDetails.metadata.course_id);
                 } else {
-                  favCourses.push(courseDetails.metadata.course_id);
+                  favCourses.push(courseDetails.metadata);
                 }
 
                 localStorage.setItem('favCourses', JSON.stringify(favCourses));
@@ -257,8 +257,8 @@ export default function CoursePage() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [displayedTab, setDisplayedTab] = useState(0);
   
-  const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]');
-  const [isFavorite, setIsFavorite] = useState(favCourses.includes(courseId));
+  const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]') as Course[];
+  const [isFavorite, setIsFavorite] = useState(favCourses.some(course => course.course_id === courseId));
   
   const [cachedDetails, setCachedDetails] = useState<{
     [key: number]: CourseDetailsAPIResponse | null
