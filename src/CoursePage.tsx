@@ -117,7 +117,7 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
                 localStorage.setItem('favCourses', JSON.stringify(favCourses));
                 setIsFavorite(!isFavorite);
               }}
-              sx={{
+              sx={{ 
                 marginLeft: 'auto',
                 color: isFavorite ? '#FFD700' : 'white', /* should I just use 'yellow' instead? */
                 padding: '8px',
