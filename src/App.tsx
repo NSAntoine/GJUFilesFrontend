@@ -83,7 +83,6 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]') as Course[];
-  console.log(favCourses);
 
   const handleFacultyClick = (facultyId: number) => {
     setCurrentPage(1);
@@ -204,12 +203,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetchCourses(currentPage, searchQuery, currentFaculty, setError);
+      fetchCourses(currentPage, searchQuery, currentFaculty, setError);
   }, [currentPage]);
-
-  useEffect(() => {
-    fetchCourses(1, '', currentFaculty, setError);
-  }, []);
 
   return (
     <>
