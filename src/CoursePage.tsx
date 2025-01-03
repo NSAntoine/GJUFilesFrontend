@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { API_COURSE_DETAILS_URL, API_INSERT_COURSE_LINK_URL, API_INSERT_COURSE_URL } from './APIDefines'
 import SearchAppBar from './SearchAppBar'
@@ -23,7 +23,13 @@ export function errorPage(error: string) {
   return <div>Error: {error}</div>
 }
 
-function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab: number, setSelectedTab: (tab: number) => void, isFavorite: boolean, setIsFavorite: (isFavorite: boolean) => void) {
+function CourseDetailsView(
+  courseDetails: CourseDetailsAPIResponse, 
+  selectedTab: number, 
+  setSelectedTab: (tab: number) => void, 
+  isFavorite: boolean, 
+  setIsFavorite: (isFavorite: boolean) => void
+) {
   function tabView(tab: number, emoji: string, text: string) {
     return <div 
       style={{
@@ -211,7 +217,11 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
           }}>
             {courseDetails.resources.length > 0 ? (
               courseDetails.resources.map((resource) => (
-                <ResourceCard key={resource.resource_info.resource_id} resource={resource} />
+                <ResourceCard 
+                  key={resource.resource_info.resource_id} 
+                  resource={resource}
+                  data-resource-id={resource.resource_info.resource_id}
+                />
               ))
             ) : (
               <Box sx={{ 
@@ -252,10 +262,12 @@ function CourseDetailsView(courseDetails: CourseDetailsAPIResponse, selectedTab:
 
 export default function CoursePage() {
   const { courseId } = useParams()
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || 0;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [displayedTab, setDisplayedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(Number(tab));
+  const [displayedTab, setDisplayedTab] = useState(Number(tab));
   
   const favCourses = JSON.parse(localStorage.getItem('favCourses') || '[]') as Course[];
   const [isFavorite, setIsFavorite] = useState(favCourses.some(course => course.course_id === courseId));
@@ -298,7 +310,13 @@ export default function CoursePage() {
         {error ? (
           errorPage(error)
         ) : cachedDetails[displayedTab] ? (
-          CourseDetailsView(cachedDetails[displayedTab]!, selectedTab, setSelectedTab, isFavorite, setIsFavorite)
+          CourseDetailsView(
+            cachedDetails[displayedTab]!, 
+            selectedTab, 
+            setSelectedTab, 
+            isFavorite, 
+            setIsFavorite
+          )
         ) : (
           <CircularProgress size={50} style={{ margin: 'auto', display: 'block' }} />
         )}
